@@ -1,6 +1,16 @@
 import pytest
 from model import Question
 
+@pytest.fixture
+def default_question():
+    question = Question(title='Default question', points=10, max_selections=1)
+
+    question.add_choice('A', False)
+    question.add_choice('B', False)
+    question.add_choice('C', False)
+    question.add_choice('D', False)
+    
+    return question 
 
 def test_create_question():
     question = Question(title='q1')
@@ -131,3 +141,18 @@ def test_multiple_correct_choices_with_max_selections_1():
     assert question.correct_selected_choices([1]) == [1]
 
     assert question.correct_selected_choices([2]) == [2]
+
+def test_question_with_no_correct_choice(default_question):
+    assert default_question.correct_selected_choices([1]) == []
+    assert default_question.correct_selected_choices([2]) == []
+    assert default_question.correct_selected_choices([3]) == []
+    assert default_question.correct_selected_choices([4]) == []
+
+def test_remove_valid_choice(default_question):
+    default_question.set_correct_choices([1])
+
+    assert default_question.correct_selected_choices([1]) == [1]
+
+    default_question.remove_choice_by_id(1)
+
+    assert default_question.correct_selected_choices([1]) == []
